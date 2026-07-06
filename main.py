@@ -1,7 +1,11 @@
-print("🔥 MAIN STARTED")
+print("🔥 BOT STARTED")
 
-import time
+from telegram_sender import send_report
 
-time.sleep(5)
+try:
+    send_report()
+    print("📲 MESSAGE SENT")
+except Exception as e:
+    print("❌ ERROR:", e)
 
-print("🏁 MAIN FINISHED")
+print("🏁 BOT FINISHED")
