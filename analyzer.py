@@ -2,9 +2,11 @@ import requests
 
 
 # =========================
-# 🥈 قیمت نقره جهانی
+# 🥈 قیمت نقره (Multi-source)
 # =========================
 def get_silver_price():
+
+    # 🔹 منبع 1
     try:
         url = "https://api.metals.live/v1/spot"
         r = requests.get(url, timeout=5)
@@ -12,15 +14,33 @@ def get_silver_price():
 
         for item in data:
             if item.get("metal") == "silver":
-                return float(item.get("price"))
+                price = float(item.get("price"))
+                if price > 0:
+                    return price
     except:
         pass
 
-    return 28.5  # fallback امن
+    # 🔹 منبع 2
+    try:
+        url = "https://www.goldapi.io/api/XAG/USD"
+        headers = {"x-access-token": "demo"}
+
+        r = requests.get(url, headers=headers, timeout=5)
+        data = r.json()
+
+        if "price" in data:
+            price = float(data["price"])
+            if price > 0:
+                return price
+    except:
+        pass
+
+    # ❌ اگر هیچ منبعی جواب نداد
+    return None
 
 
 # =========================
-# 💵 دلار واقعی (IRR → Toman)
+# 💵 قیمت دلار
 # =========================
 def get_usd_price():
     try:
@@ -29,41 +49,54 @@ def get_usd_price():
         data = r.json()
 
         irr = data["rates"]["IRR"]
-        return float(irr) / 10  # تبدیل ریال به تومان
+        return float(irr) / 10  # ریال → تومان
+
     except:
-        return 600000  # fallback امن
+        return 600000  # fallback
 
 
 # =========================
-# 📊 محاسبه قیمت ذاتی
+# 📦 قیمت ذاتی
 # =========================
 def intrinsic_value(silver, usd):
     return (silver * usd * 31.1) / 1000
 
 
 # =========================
-# 💣 محاسبه حباب ایران
+# 💣 حباب ایران
 # =========================
 def calculate_bubble(intrinsic, market):
     return ((market - intrinsic) / intrinsic) * 100
 
 
 # =========================
-# 🧠 تحلیل اصلی و سیگنال
+# 🧠 تحلیل نهایی + سیگنال
 # =========================
 def analyze():
 
     silver = get_silver_price()
+
+    # اگر دیتا نبود
+    if silver is None:
+        return {
+            "silver": "NO DATA",
+            "usd": 0,
+            "intrinsic": 0,
+            "market": 0,
+            "bubble": 0,
+            "score": 0,
+            "signal": "🔴 عدم دریافت دیتا از منابع"
+        }
+
     usd = get_usd_price()
 
     intrinsic = intrinsic_value(silver, usd)
 
-    # مدل بازار ایران (اگر قیمت واقعی نداری)
+    # مدل بازار ایران (تخمینی)
     market = intrinsic * 1.08
 
     bubble = calculate_bubble(intrinsic, market)
 
-    # امتیاز خرید
     score = 100 - abs(bubble) * 2
     score = max(0, min(100, score))
 
@@ -71,15 +104,15 @@ def analyze():
     # 🚦 سیگنال حرفه‌ای
     # =========================
     if bubble < 3:
-        signal = "🟢 خرید قوی (ارزشمند)"
+        signal = "🟢 خرید قوی"
     elif bubble < 8:
-        signal = "🟢 ورود پله‌ای مناسب"
+        signal = "🟢 ورود پله‌ای"
     elif bubble < 15:
-        signal = "🟡 صبر یا خرید سبک"
+        signal = "🟡 صبر / خرید سبک"
     elif bubble < 25:
-        signal = "🔴 پرریسک - اصلاح محتمل"
+        signal = "🔴 پرریسک"
     else:
-        signal = "🔴 حباب بالا - ورود ممنوع"
+        signal = "🔴 حباب بالا - عدم ورود"
 
     return {
         "silver": silver,
