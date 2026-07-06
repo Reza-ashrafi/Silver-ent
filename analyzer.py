@@ -1,10 +1,13 @@
 import requests
 
 
+# =========================
+# 🥈 قیمت نقره جهانی
+# =========================
 def get_silver_price():
     try:
         url = "https://api.metals.live/v1/spot"
-        r = requests.get(url, timeout=10)
+        r = requests.get(url, timeout=5)
         data = r.json()
 
         for item in data:
@@ -13,9 +16,12 @@ def get_silver_price():
     except:
         pass
 
-    return 28.5
+    return 28.5  # fallback امن
 
 
+# =========================
+# 💵 دلار واقعی (IRR → Toman)
+# =========================
 def get_usd_price():
     try:
         url = "https://api.exchangerate.host/latest?base=USD&symbols=IRR"
@@ -23,36 +29,64 @@ def get_usd_price():
         data = r.json()
 
         irr = data["rates"]["IRR"]
-        return float(irr) / 10
+        return float(irr) / 10  # تبدیل ریال به تومان
     except:
-        return 60000
+        return 600000  # fallback امن
 
 
+# =========================
+# 📊 محاسبه قیمت ذاتی
+# =========================
+def intrinsic_value(silver, usd):
+    return (silver * usd * 31.1) / 1000
+
+
+# =========================
+# 💣 محاسبه حباب ایران
+# =========================
+def calculate_bubble(intrinsic, market):
+    return ((market - intrinsic) / intrinsic) * 100
+
+
+# =========================
+# 🧠 تحلیل اصلی و سیگنال
+# =========================
 def analyze():
+
     silver = get_silver_price()
     usd = get_usd_price()
 
-    fair_value = (silver * usd * 31.1) / 1000
-    market = fair_value * 1.05
+    intrinsic = intrinsic_value(silver, usd)
 
-    bubble = ((market - fair_value) / fair_value) * 100
+    # مدل بازار ایران (اگر قیمت واقعی نداری)
+    market = intrinsic * 1.08
 
+    bubble = calculate_bubble(intrinsic, market)
+
+    # امتیاز خرید
     score = 100 - abs(bubble) * 2
     score = max(0, min(100, score))
 
-    if bubble < 5:
-        decision = "🟢 مناسب ورود"
+    # =========================
+    # 🚦 سیگنال حرفه‌ای
+    # =========================
+    if bubble < 3:
+        signal = "🟢 خرید قوی (ارزشمند)"
+    elif bubble < 8:
+        signal = "🟢 ورود پله‌ای مناسب"
     elif bubble < 15:
-        decision = "🟡 محتاط"
+        signal = "🟡 صبر یا خرید سبک"
+    elif bubble < 25:
+        signal = "🔴 پرریسک - اصلاح محتمل"
     else:
-        decision = "🔴 پرریسک"
+        signal = "🔴 حباب بالا - ورود ممنوع"
 
     return {
         "silver": silver,
         "usd": usd,
-        "fair": fair_value,
+        "intrinsic": intrinsic,
         "market": market,
         "bubble": bubble,
         "score": score,
-        "decision": decision
+        "signal": signal
     }
