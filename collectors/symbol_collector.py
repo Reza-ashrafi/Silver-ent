@@ -1,8 +1,6 @@
-import pandas as pd
-from datetime import datetime
+import json
 
 from collectors.tsetmc_client import TSETMCClient
-from config.settings import SYMBOL_DIR
 
 
 class SymbolCollector:
@@ -11,16 +9,13 @@ class SymbolCollector:
         self.client = TSETMCClient()
 
     def collect(self):
-        """
-        دریافت لیست نمادهای بازار
-        """
 
         url = (
             "https://cdn.tsetmc.com/api/Instrument/GetInstrumentInfo"
         )
 
-        data = self.client.get(url)
+        response = self.client.get(url)
 
-        print("TSETMC data received")
+        data = json.loads(response)
 
         return data
