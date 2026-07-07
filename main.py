@@ -7,24 +7,23 @@ def main():
     print(f"{PROJECT_NAME} Started")
 
     try:
-        print("MAIN FUNCTION RUNNING")
+        print("1 - MAIN OK")
 
         collector = SymbolCollector()
 
+        print("2 - COLLECTOR CREATED")
+
         data = collector.collect()
 
-        print("TSETMC Connected")
+        print("3 - DATA RECEIVED")
 
         print(type(data))
 
-        if isinstance(data, dict):
-            print(data.keys())
-
-        else:
-            print(data[:500])
+        print(data)
 
     except Exception as e:
         print("ERROR:")
+        print(type(e))
         print(e)
 
 
