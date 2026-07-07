@@ -6,11 +6,13 @@ class SymbolCollector:
     def __init__(self):
         self.client = TSETMCClient()
 
+
     def collect(self):
 
         print("SYMBOL COLLECT START")
 
-        url = "https://cdn.tsetmc.com/api/Instrument/GetInstrumentInfo"
+        # تست اولیه اتصال
+        url = "https://www.tsetmc.com"
 
         print("REQUEST URL READY")
 
