@@ -3,7 +3,7 @@ from collectors.symbol_collector import SymbolCollector
 
 
 def main():
-
+print("MAIN FUNCTION RUNNING")
     print(f"{PROJECT_NAME} Started")
 
     try:
