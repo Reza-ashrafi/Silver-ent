@@ -18,5 +18,22 @@ class TSETMCClient:
         for i in range(RETRY_COUNT):
 
             try:
+                print(f"TRY {i + 1}")
 
-                print(f"TRY {i+1}")
+                response = requests.get(
+                    url,
+                    timeout=self.timeout
+                )
+
+                print("STATUS:", response.status_code)
+
+                if response.status_code == 200:
+                    return response.text
+
+            except Exception as e:
+                last_error = e
+                print("ERROR:", e)
+
+        raise Exception(
+            f"TSETMC connection failed: {last_error}"
+        )
