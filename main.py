@@ -10,7 +10,7 @@ def main():
 
     symbols = collector.collect()
 
-    print(symbols[:500])
+    print(symbols.keys())
 
 
 if __name__ == "__main__":
